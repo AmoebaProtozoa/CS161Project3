@@ -161,11 +161,12 @@ class PacketUtils:
         syn_packet = self.send_pkt(flags = "A")
         syn_sport = syn_packet[IP].sport
         syn_seq = syn_packet[IP].seq
-        print "source port = " + syn_sport + "  seq = " + seq
+        print "source port = " + syn_sport + "  seq = "
+        print syn_seq
         synack_packet = self.get_pkt()
         if synack_packet == None:
             return "DEAD"
-        return "NEED TO IMPLEMENT"
+        return "LIVE"
 
     # Format is
     # ([], [])
