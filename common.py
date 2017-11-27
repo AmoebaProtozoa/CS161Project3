@@ -163,7 +163,7 @@ class PacketUtils:
         syn_seq = syn_packet[IP].seq
         print "source port = " + syn_sport + "  seq = " + seq
         synack_packet = self.get_pkt()
-        if synack_packet = None:
+        if synack_packet == None:
             return "DEAD"
         return "NEED TO IMPLEMENT"
 
