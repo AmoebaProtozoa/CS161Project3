@@ -14,7 +14,7 @@ maxhop = 25
 # A request that will trigger the great firewall but will NOT cause
 # the web server to process the connection.  You probably want it here
 
-triggerfetch = """YOU MIGHT WANT SOMETHING HERE"""
+triggerfetch = """GET/ HTTP /1.1 host: www.google.com"""
 
 # A couple useful functions that take scapy packets
 def isRST(p):
@@ -50,10 +50,10 @@ class PacketUtils:
 
         # Get the destination ethernet address with an ARP
         self.arp()
-        
+
         # You can add other stuff in here to, e.g. keep track of
         # outstanding ports, etc.
-        
+
         # Start the packet sniffer
         t = threading.Thread(target=self.run_sniffer)
         t.daemon = True
@@ -152,19 +152,26 @@ class PacketUtils:
     # server itself (from a previous traceroute incantation
     def evade(self, target, msg, ttl):
         return "NEED TO IMPLEMENT"
-        
+
     # Returns "DEAD" if server isn't alive,
     # "LIVE" if teh server is alive,
     # "FIREWALL" if it is behind the Great Firewall
     def ping(self, target):
         # self.send_msg([triggerfetch], dst=target, syn=True)
+        syn_packet = self.send_pkt(flags = "A")
+        syn_sport = syn_packet[IP].sport
+        syn_seq = syn_packet[IP].seq
+        print "source port = " + syn_sport + "  seq = " + seq
+        synack_packet = self.get_pkt()
+        if synack_packet = None:
+            return "DEAD"
         return "NEED TO IMPLEMENT"
 
     # Format is
     # ([], [])
     # The first list is the list of IPs that have a hop
     # or none if none
-    # The second list is T/F 
+    # The second list is T/F
     # if there is a RST back for that particular request
     def traceroute(self, target, hops):
         return "NEED TO IMPLEMENT"
