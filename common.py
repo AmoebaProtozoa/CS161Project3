@@ -189,35 +189,40 @@ class PacketUtils:
         IPs = []
         Behindwall = []
 	for hop in range(hops):
+            print hop
+            while True:
+                syn_packet = self.send_pkt(flags = "S")
+                syn_sport = syn_packet[IP].sport
+                syn_seq = syn_packet[IP].seq
+		
+		time.sleep(1)
+		synack_packet = None
+		while not self.packetQueue.empty():
+		    synack_packet = self.get_pkt()
+		    if synack_packet!= None and TCP in synack_packet and synack_packet[TCP].ack == syn_seq + 1:
+			print "done"
+			break
+                if synack_packet!= None and TCP in synack_packet and synack_packet[TCP].ack == syn_seq + 1:
+		    print "handshake done"
+                    break
 
-        while True:
-            self.packetQueue.queue.clear()
-            syn_packet = self.send_pkt(flags = "S")
-            syn_sport = syn_packet[IP].sport
-            syn_seq = syn_packet[IP].seq
-
-            synack_packet = self.get_pkt()
             synack_seq = synack_packet[TCP].seq
             synack_ack = synack_packet[TCP].ack
-
-            if synack_packet!= None and TCP in synack_packet and synack_packet[TCP].ack == syn_seq + 1:
-                break
-            time.sleep(0.5)
-
-
-        ack_packet = self.send_pkt(flags = "A", sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
+            ack_packet = self.send_pkt(flags = "A", sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
 
             for i in range(3):
-                self.send_pkt(flags = "A", payload = triggerfetch, ttl = hop + 1, sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
-            recieved_packet = self.get_pkt()
-            if recieved_packet == None:
-                IPs.append(None)
-                Behindwall.append(False)
-            if isICMP(recieved_packet) and isTimeExceeded(recieved_packet):
-                IPs.append(recieved_packet[IP].src)
+                self.send_pkt(flags = "PA", payload = triggerfetch, ttl = hop + 1, sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
+            time.sleep(2)
+	    recieved_packets = []
+	    while not self.packetQueue.empty():
+	        recieved_packets.append(self.get_pkt())
+            ICPMs = [isICMP(pkt) and isTimeExceeded(pkt) for pkt in recieved_packets]
+	    RSTs = [isRST(pkt) for pkt in recieved_packets]
+            if sum(ICPMs) >= 1:
+                IPs.append(recieved_packets[ICPMs.index(1)][IP].src)
             else:
                 IPs.append(None)
-            if isRST(recieved_packet):
+            if sum(RSTs) >= 1:
                 Behindwall.append(True)
             else:
                 Behindwall.append(False)
