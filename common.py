@@ -204,10 +204,12 @@ class PacketUtils:
             if recieved_packet == None:
                 IPs.append(None)
 	        Behindwall.append(False)
+            if isICMP(recieved_packet) and isTimeExceeded(recieved_packet):
+                IPs.append(recieved_packet[IP].src)
+            else:
+                IPs.append(False)
             if isRST(recieved_packet):
-                IPs.append(recieved_packet[IP].src)
                 Behindwall.append(True)
-            elif isICMP(recieved_packet) and isTimeExceeded(recieved_packet):
-                IPs.append(recieved_packet[IP].src)
+            else:
                 Behindwall.append(False)
         return (IPs, Behindwall)
