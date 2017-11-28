@@ -1,2 +1,7 @@
 Describe (in 2-3 paragraphs) your evasion strategy:
+First, break message in bytes, creating a list called sliced
 
+Send each byte of the message individually with increasing sequence number coresponding to the bytes currently sending.
+ However, when sending the odd bytes of the actual message, also send package with same sequence number with the real one but with nonsense like "foo" "bar" as payload, just with ttl thats just enough to reach firewall but not enough to reach actuall destination.
+ 
+In the end, actual server has both the correct even and odd bytes of the message and can reconstruct message from them. However, there is no way for the firewall to reconstruct message since there are too many nonsense with the same sequence number sended along with the even message.

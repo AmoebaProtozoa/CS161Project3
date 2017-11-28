@@ -1,0 +1,7 @@
+The hardest part to understand is part three, there are few problems with it:
+
+1. The documentation did a very poor job of explaing whats actually going on. Its simply too short. For example, there seems to be a gap between instruction and what code is asking for us. There is no way to understand we need to iterate for every number smaller than hops from just pdf.
+
+2. Its far from complete, many of the trick and basics are on piazza. I agree with putting hint on piazza, but that should be only 30% most. With this project, I feel at least 60% of the useful information thats necessary is on piazza. Ideally it should be lower thus allow student to finished it without external help.
+
+3. Testing for the whole project is off. The chinese server is way too inconsistent, I understand that this is to create a "real life" experience, but unable to use school wifi is just too much and may even be unfair to someone. I have to finish the whole thing in cafe strata since both my school and home wifi cant be used. It get very cold there very fast there.
