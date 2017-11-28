@@ -185,25 +185,34 @@ class PacketUtils:
     # The second list is T/F
     # if there is a RST back for that particular request
     def traceroute(self, target, hops):
-        syn_packet = self.send_pkt(flags = "S")
-        syn_sport = syn_packet[IP].sport
-        syn_seq = syn_packet[IP].seq
-
-        synack_packet = self.get_pkt()
-        synack_seq = synack_packet[TCP].seq
-        synack_ack = synack_packet[TCP].ack
-        ack_packet = self.send_pkt(flags = "A", sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
 
         IPs = []
         Behindwall = []
 	for hop in range(hops):
-	    self.packetQueue.queue.clear()
+
+        while True:
+            self.packetQueue.queue.clear()
+            syn_packet = self.send_pkt(flags = "S")
+            syn_sport = syn_packet[IP].sport
+            syn_seq = syn_packet[IP].seq
+
+            synack_packet = self.get_pkt()
+            synack_seq = synack_packet[TCP].seq
+            synack_ack = synack_packet[TCP].ack
+
+            if synack_packet!= None and TCP in synack_packet and synack_packet[TCP].ack == syn_seq + 1:
+                break
+            time.sleep(0.5)
+
+
+        ack_packet = self.send_pkt(flags = "A", sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
+
             for i in range(3):
                 self.send_pkt(flags = "A", payload = triggerfetch, ttl = hop + 1, sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
             recieved_packet = self.get_pkt()
             if recieved_packet == None:
                 IPs.append(None)
-	        Behindwall.append(False)
+                Behindwall.append(False)
             if isICMP(recieved_packet) and isTimeExceeded(recieved_packet):
                 IPs.append(recieved_packet[IP].src)
             else:
