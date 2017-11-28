@@ -167,8 +167,11 @@ class PacketUtils:
                 self.send_pkt(flags = "A", payload = sliced[i], sport = syn_sport, seq = syn_seq + 1 + i, ack = synack_seq + 1)
                 self.send_pkt(flags = "A", ttl = ttl, payload = "bar", sport = syn_sport, seq = syn_seq + 1 + i, ack = synack_seq + 1)
 
-        recieved_packet = self.get_pkt()
-        return recieved_packet[TCP].payload
+        recieved_packets = []
+        while not self.packetQueue.empty():
+	        recieved_packets.append(self.get_pkt())
+            TCPs = [TCP in pkt for pkt in recieved_packets]
+        return recieved_packets[TCPs.index(1)][TCP].payload
 
     # Returns "DEAD" if server isn't alive,
     # "LIVE" if teh server is alive,
