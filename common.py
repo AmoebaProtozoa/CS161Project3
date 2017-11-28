@@ -151,7 +151,24 @@ class PacketUtils:
     # ttl is a ttl which triggers the Great Firewall but is before the
     # server itself (from a previous traceroute incantation
     def evade(self, target, msg, ttl):
-        return "NEED TO IMPLEMENT"
+        sliced = [elem for elem in msg]
+        syn_packet = self.send_pkt(flags = "S")
+        syn_sport = syn_packet[IP].sport
+        syn_seq = syn_packet[IP].seq
+        synack_packet = self.get_pkt()
+        synack_seq = synack_packet[TCP].seq
+        synack_ack = synack_packet[TCP].ack
+        ack_packet = self.send_pkt(flags = "A", sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
+        for i in range(len(sliced)):
+            if i % 2 == 0:
+                self.send_pkt(flags = "A", payload = sliced[i], sport = syn_sport, seq = syn_seq + 1 + i, ack = synack_seq + 1)
+            else:
+                self.send_pkt(flags = "A", ttl = ttl, payload = "foo", sport = syn_sport, seq = syn_seq + 1 + i, ack = synack_seq + 1)
+                self.send_pkt(flags = "A", payload = sliced[i], sport = syn_sport, seq = syn_seq + 1 + i, ack = synack_seq + 1)
+                self.send_pkt(flags = "A", ttl = ttl, payload = "bar", sport = syn_sport, seq = syn_seq + 1 + i, ack = synack_seq + 1)
+
+        recieved_packet = self.get_pkt()
+        return recieved_packet[TCP].payload
 
     # Returns "DEAD" if server isn't alive,
     # "LIVE" if teh server is alive,
@@ -194,7 +211,7 @@ class PacketUtils:
                 syn_packet = self.send_pkt(flags = "S")
                 syn_sport = syn_packet[IP].sport
                 syn_seq = syn_packet[IP].seq
-		
+
 		time.sleep(1)
 		synack_packet = None
 		while not self.packetQueue.empty():
