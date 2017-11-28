@@ -207,7 +207,7 @@ class PacketUtils:
             if isICMP(recieved_packet) and isTimeExceeded(recieved_packet):
                 IPs.append(recieved_packet[IP].src)
             else:
-                IPs.append(False)
+                IPs.append(None)
             if isRST(recieved_packet):
                 Behindwall.append(True)
             else:
