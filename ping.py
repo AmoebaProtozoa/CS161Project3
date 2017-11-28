@@ -16,6 +16,3 @@ if __name__ == '__main__':
 
     tr = common.PacketUtils(dst=target)
     print tr.ping(target)
-
-
-
