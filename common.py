@@ -164,19 +164,19 @@ class PacketUtils:
         synack_packet = self.get_pkt()
         if synack_packet == None:
             return "DEAD"
-	    synack_seq = synack_packet[TCP].seq
-	    synack_ack = synack_packet[TCP].ack
-	    ack_packet = self.send_pkt(flags = "A", sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
+	synack_seq = synack_packet[TCP].seq
+	synack_ack = synack_packet[TCP].ack
+	ack_packet = self.send_pkt(flags = "A", sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
         sensitive_packet = self.send_pkt(flags = "A", payload = triggerfetch, sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
-	    timeout = 5
-	    timeout_end = time.time() + timeout
-	    while time.time() < timeout_end:
-	           recieved_packet = self.get_pkt()
-	              if recieved_packet == None:
-		              break
-	              if isRST(recieved_packet):
-	                     return "FIREWALL"
-	    return "LIVE"
+	timeout = 5
+	timeout_end = time.time() + timeout
+	while time.time() < timeout_end:
+	    recieved_packet = self.get_pkt()
+	    if recieved_packet == None:
+		break
+	    if isRST(recieved_packet):
+	        return "FIREWALL"
+	return "LIVE"
 
     # Format is
     # ([], [])
@@ -185,8 +185,4 @@ class PacketUtils:
     # The second list is T/F
     # if there is a RST back for that particular request
     def traceroute(self, target, hops):
-        syn_packet = self.send_pkt(flags = "S")
-        syn_sport = syn_packet[IP].sport
-        syn_seq = syn_packet[IP].seq
-        synack_packet = self.get_pkt()
         return "NEED TO IMPLEMENT"
