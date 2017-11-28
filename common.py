@@ -196,18 +196,18 @@ class PacketUtils:
 
         IPs = []
         Behindwall = []
-
-        for i in range(3):
-            self.send_pkt(flags = "A", payload = triggerfetch, ttl = hops, sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
-
-        while true:
+	for hop in range(hops):
+	    self.packetQueue.queue.clear()
+            for i in range(3):
+                self.send_pkt(flags = "A", payload = triggerfetch, ttl = hop + 1, sport = syn_sport, seq = syn_seq + 1, ack = synack_seq + 1)
             recieved_packet = self.get_pkt()
             if recieved_packet == None:
-                break
+                IPs.append(None)
+	        Behindwall.append(False)
             if isRST(recieved_packet):
-                IPs.append(recieved_packet[TCP].src)
+                IPs.append(recieved_packet[IP].src)
                 Behindwall.append(True)
             elif isICMP(recieved_packet) and isTimeExceeded(recieved_packet):
-                IPs.append(recieved_packet[TCP].src)
+                IPs.append(recieved_packet[IP].src)
                 Behindwall.append(False)
         return (IPs, Behindwall)
